@@ -3,9 +3,9 @@ from mk import run_mk
 from dw import run_dw
 from ch import run_ch
 
-x = 5
 
 def main():
+    x = 5
     print(f"설정값: {x}")
     x = run_hd(x)
     print(f"현도 통과: {x}")
