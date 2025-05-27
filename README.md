@@ -1,1 +1,1 @@
-# pill-detect-ai
+# SuperDog is the best.
