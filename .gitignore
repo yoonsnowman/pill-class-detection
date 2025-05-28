@@ -22,17 +22,17 @@ __pycache__/
 *.pyd
 
 # ▶ 주피터 자동 생성 체크포인트
-.ipynb_checkpoints/
+# .ipynb_checkpoints/
 
 # ▶ 환경설정/민감 정보
 .env
 *.env
 *.key
-*.json
+# *.json
 *.secret
 
 # ▶ OS 및 에디터에서 생기는 불필요 파일
-.DS_Store
-Thumbs.db
-.vscode/
-.idea/
+# .DS_Store
+# Thumbs.db
+# .vscode/
+# .idea/
