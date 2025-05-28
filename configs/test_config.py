@@ -1,7 +1,6 @@
 # test_config.py
 import os, sys
-from configs.config_sh import DIR
-sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+from config import DIR
 
 
 
@@ -22,7 +21,7 @@ def main():
     print("\n📷 [train/test 이미지 파일 개수 확인]")
 
     # 🔹 train 이미지 수
-    train_path = DIR['raw_train']
+    train_path = DIR['yolo_train']
     if os.path.exists(train_path):
         train_imgs = [f for f in os.listdir(train_path) if os.path.isfile(os.path.join(train_path, f))]
         print(f"✔ TRAIN 이미지: {len(train_imgs)}개")
@@ -31,7 +30,7 @@ def main():
         print("❌ TRAIN 경로가 존재하지 않음")
 
     # 🔹 test 이미지 수
-    test_path = DIR['raw_test']
+    test_path = DIR['yolo_test']
     if os.path.exists(test_path):
         test_imgs = [f for f in os.listdir(test_path) if os.path.isfile(os.path.join(test_path, f))]
         print(f"✔ TEST 이미지: {len(test_imgs)}개")

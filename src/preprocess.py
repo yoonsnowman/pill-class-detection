@@ -309,14 +309,14 @@ if __name__ == '__main__':
 
     # 1. 파일 경로 설정
     # 캐글 데이터셋이 /content/ai02-level1-project/ 에 압축 해제되었다고 가정
-    kaggle_data_root = '/content/ai02-level1-project/'
+    kaggle_data_root = 'data/yolo'
 
     # train_annotations 폴더 내의 모든 JSON 파일 경로를 재귀적으로 찾습니다.
     # 사진에서 본 경로: train_annotations -> K-001900... -> K-001900 -> *.json
     # 따라서 **/*.json 패턴을 사용하여 모든 하위 디렉토리를 탐색합니다.
     json_annotations_dir = os.path.join(kaggle_data_root, 'train_annotations')
     print(f"Listing contents of annotation directory: {json_annotations_dir}")
-    !ls -R {json_annotations_dir} # -R 옵션으로 하위 디렉토리까지 모두 출력
+    # !ls -R {json_annotations_dir} # -R 옵션으로 하위 디렉토리까지 모두 출력
 
     json_paths = glob(os.path.join(json_annotations_dir, '**', '*.json'), recursive=True)
 
@@ -336,7 +336,7 @@ if __name__ == '__main__':
         print(f"Error: train_images directory not found at {image_base_dir}. Please check your dataset extraction.")
         exit()
 
-    output_yolo_data_dir = '/content/datasets/pill_yolo_format' # 변환된 데이터가 저장될 새 폴더
+    output_yolo_data_dir = 'data/yolo/pill_yolo_format' # 변환된 데이터가 저장될 새 폴더
 
     # 변환 스크립트 실행
     converted_class_names = merge_and_convert_coco_to_yolo(json_paths, image_base_dir, output_yolo_data_dir, val_split=0.2)

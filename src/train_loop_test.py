@@ -1,15 +1,11 @@
-# src/train_loop.py
-
-import sys
-import os
-sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))  # ← 요거 추가
+# src/train_loop_test.py
+from autoconfig import DIR
 
 import torch
-from configs.config_sh import DIR
-
+import os, sys
 def dummy_training():
     print("📁 [경로 확인]")
-    train_dir = DIR['raw_train']
+    train_dir = DIR('data/yolo/train_images')
     print("TRAIN 이미지 경로:", train_dir)
 
     if not os.path.exists(train_dir):
