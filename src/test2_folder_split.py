@@ -1,13 +1,12 @@
 import os, shutil
-from autoconfig import DIR
 from sklearn.model_selection import train_test_split
 
 
 def create_yolo_dataset_split(train_files, val_files, test_files):
-    base = DIR('data/yolo/raw_split')
-    src_img_train = DIR('data/yolo/train_images')     # 원본 학습 이미지
-    src_img_test  = DIR('data/yolo/test_images')      # 원본 테스트 이미지
-    src_labels    = DIR('data/yolo/raw_split/labels') # YOLO 라벨 폴더
+    base = 'data/yolo/raw_split'
+    src_img_train = 'data/yolo/train_images'     # 원본 학습 이미지
+    src_img_test  = 'data/yolo/test_images'      # 원본 테스트 이미지
+    src_labels    = 'data/yolo/raw_split/labels' # YOLO 라벨 폴더
 
     target_struct = {
         'train': {'files': train_files, 'img_src': src_img_train},
@@ -48,8 +47,8 @@ def create_yolo_dataset_split(train_files, val_files, test_files):
 
 
 if __name__ == '__main__':
-    train_img_dir = DIR('data/yolo/train_images')
-    test_img_dir  = DIR('data/yolo/test_images')
+    train_img_dir = 'data/yolo/train_images'
+    test_img_dir  = 'data/yolo/test_images'
 
     # 🔍 목록 불러오기 (존재하는 이미지 기준)
     all_imgs = [f for f in os.listdir(train_img_dir) if f.endswith('.png')]

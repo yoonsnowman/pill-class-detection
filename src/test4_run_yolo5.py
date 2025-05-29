@@ -1,11 +1,10 @@
 # src/test4_run_yolo5.py
 import os
 import subprocess
-from autoconfig2 import DIR, DIR_SAFE
 
 def run_yolov5_train():
-    data_yaml   = DIR_SAFE('data/yolo/raw_split/data.yaml')
-    project_dir = DIR_SAFE('data/yolo/raw_split/output')
+    data_yaml   = 'data/yolo/raw_split/data.yaml'
+    project_dir = 'data/yolo/raw_split/output'
     weights     = 'yolov5s.pt'
     name        = 'pill_yolo'
 
@@ -27,7 +26,7 @@ def run_yolov5_train():
     print(" ".join(f'"{arg}"' if ' ' in arg else arg for arg in command))
     print()
 
-    # ❗ 절대 os.system 쓰지 말고 subprocess.run으로!
+
     subprocess.run(command, check=True)
 
 if __name__ == '__main__':

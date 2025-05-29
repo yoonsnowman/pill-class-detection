@@ -1,5 +1,3 @@
-from autoconfig import DIR
-
 """ 라이브러리 로드 """
 # 표준 라이브러리
 import os, shutil
@@ -26,17 +24,6 @@ from torchvision import datasets, transforms
 from torchvision.transforms import v2
 # 진행 표시
 from tqdm import tqdm
-# 머신러닝 평가 지표
-from sklearn.metrics import (
-    accuracy_score, precision_score, recall_score, f1_score,
-    confusion_matrix, classification_report,
-    roc_auc_score, roc_curve
-)
-from sklearn.model_selection import train_test_split
-# 데이터 증강
-import albumentations as A
-from albumentations.pytorch import ToTensorV2
-
 
 
 
@@ -134,8 +121,8 @@ class PillAnnotationParser:
 # 🏁 실행 코드
 if __name__ == "__main__":
     parser = PillAnnotationParser(
-        annotation_dir = DIR('data/yolo/train_annotations'),
-        output_dir = DIR('data/yolo/raw_split')
+        annotation_dir = 'data/yolo/train_annotations',
+        output_dir = 'data/yolo/raw_split'
     )
 
     parser.load_annotations()
