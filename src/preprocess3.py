@@ -43,6 +43,7 @@ def merge_and_convert_coco_to_yolo(json_paths, image_base_dir, output_base_dir, 
     next_yolo_class_id = 0
 
     print("Merging COCO JSON files...")
+    # 지정해준 json_paths의 경로에 json 파일들 읽고 data에 저장
     for json_path in json_paths:
         print(f"Loading {json_path}...")
         try:
@@ -50,26 +51,32 @@ def merge_and_convert_coco_to_yolo(json_paths, image_base_dir, output_base_dir, 
                 data = json.load(f)
 
             # 카테고리 병합 및 YOLO class_id 매핑
-            # .get()을 사용하여 키가 없을 때 오류 방지
-            if 'categories' in data and data['categories']: # 'categories' 키가 있고 비어있지 않은지 확인
+            if 'categories' in data and data['categories']: 
+                # json파일의 카테고리 수만큼 반복
                 for category in data['categories']:
+                    # category에 'id' 키가 존재하고, 아직 매핑되지 않았다면 .get()을 사용하여 키가 없을 때 오류 방지
                     if category.get('id') is not None and category['id'] not in category_id_map:
+                        # 기존 COCO category id를 YOLO의 class id(0부터 시작하는 연속된 값)로 매핑
                         category_id_map[category['id']] = next_yolo_class_id
+                        # 전체 카테고리 목록에 정보 추가
                         all_categories.append({'id': category['id'], 'name': category.get('name', f"class_{category['id']}"), 'yolo_id': next_yolo_class_id})
                         next_yolo_class_id += 1
-            else:
+            else:   
+                # 'categories' 키가 없거나 유효하지 않은 경우 경고 출력
                 print(f"Warning: No valid 'categories' found in {json_path}. Skipping categories from this file.")
 
+            # 'images' 키가 존재하면 전체 이미지 목록에 추가
             if 'images' in data:
                 all_images.extend(data['images'])
             else:
                 print(f"Warning: No 'images' found in {json_path}. Skipping images from this file.")
 
+            # 'annotations' 키가 존재하면 전체 어노테이션 목록에 추가
             if 'annotations' in data:
                 all_annotations.extend(data['annotations'])
             else:
                 print(f"Warning: No 'annotations' found in {json_path}. Skipping annotations from this file.")
-
+        # 예외 처리리
         except json.JSONDecodeError:
             print(f"Error: Could not decode JSON from {json_path}. Skipping.")
         except KeyError as e:
@@ -78,8 +85,10 @@ def merge_and_convert_coco_to_yolo(json_paths, image_base_dir, output_base_dir, 
             print(f"An unexpected error occurred while processing {json_path}: {e}. Skipping.")
 
 
-    # 최종 클래스 이름 리스트 (YOLO class_id 순서대로)
+    # all_categories 리스트를 yolo_id 기준으로 정렬한 후,
+    # 각 카테고리의 'name'만 추출하여 final_class_names 리스트에 저장
     final_class_names = [cat['name'] for cat in sorted(all_categories, key=lambda x: x['yolo_id'])]
+    # 최종 클래스 이름 리스트 (YOLO class_id 순서대로)
     num_classes = len(final_class_names)
 
     print(f"Merged total {len(all_images)} images and {len(all_annotations)} annotations.")
@@ -110,16 +119,19 @@ def merge_and_convert_coco_to_yolo(json_paths, image_base_dir, output_base_dir, 
             print(f"Warning: Non-integer image_id found in annotation: {image_id_raw}. Skipping annotation {anno}.")
             continue
 
+        # image_id가 None이 아닌 경우 (즉, 유효한 이미지 ID가 있는 경우)
         if image_id is not None:
+            # 아직 image_annotations_map에 해당 image_id가 없으면, 빈 리스트로 초기화
             if image_id not in image_annotations_map:
                 image_annotations_map[image_id] = []
+            # 해당 이미지 ID에 대한 주석(annotation)을 리스트에 추가
             image_annotations_map[image_id].append(anno)
         else:
             print(f"Warning: Annotation without 'image_id' found: {anno}. Skipping.")
 
     print(f"Number of images with annotations in image_annotations_map: {len(image_annotations_map)}")
 
-    # 이미지 ID 리스트를 학습/검증 세트로 분할
+    # 학습/검증 세트로 분할하기 위한 이미지 ID 리스트 생성
     image_ids_to_split = list(image_annotations_map.keys())
 
     # *** IMPORTANT CHECK FOR EMPTY DATA ***
@@ -140,11 +152,18 @@ def merge_and_convert_coco_to_yolo(json_paths, image_base_dir, output_base_dir, 
     # stratify를 위한 라벨 생성
     # 각 이미지에 첫 번째 어노테이션의 클래스 ID를 사용합니다.
     # 이미지에 어노테이션이 없는 경우, 또는 유효한 category_id가 없는 경우는 None으로 처리합니다.
+
+    # 이미지별로 stratify에 사용할 라벨을 저장할 리스트 초기화
     stratify_labels_raw = []
+    # 분할 대상 이미지 ID 목록을 순회하면서
     for img_id in image_ids_to_split:
+        # 해당 이미지 ID에 대한 모든 어노테이션을 가져옴
         annotations_for_img = image_annotations_map.get(img_id)
+        # 어노테이션이 존재하고, 첫 번째 어노테이션에 category_id가 있다면
         if annotations_for_img and annotations_for_img[0].get('category_id') is not None:
+            # COCO 포맷의 category_id를 추출
             coco_cat_id = annotations_for_img[0]['category_id']
+            # 이를 YOLO 클래스 ID로 변환하여 stratify 라벨 리스트에 추가
             stratify_labels_raw.append(category_id_map.get(coco_cat_id))
         else:
             stratify_labels_raw.append(None) # 어노테이션 없거나 유효 ID 없는 경우
@@ -155,7 +174,7 @@ def merge_and_convert_coco_to_yolo(json_paths, image_base_dir, output_base_dir, 
     stratify_possible = True
     if len(set(valid_stratify_labels)) < 2: # 유효한 클래스가 단 하나이거나 전혀 없는 경우
         stratify_possible = False
-        print("Warning: Only one class or no valid classes found for stratification. Performing simple train/val split.")
+        print("Warning: Only one class or no valid classes found for s  tratification. Performing simple train/val split.")
     else:
         # 각 클래스별 샘플 개수를 세어 1개인 클래스가 있는지 확인
         class_counts = Counter(valid_stratify_labels)
@@ -194,11 +213,12 @@ def merge_and_convert_coco_to_yolo(json_paths, image_base_dir, output_base_dir, 
     # 2. 데이터 변환 및 파일 복사
     print("Converting to YOLO format and copying files...")
     processed_images_count = 0
-    for img_id in image_ids_to_split: # Only iterate over images that have annotations
+    for img_id in image_ids_to_split: # 어노테이션이 있는 이미지들만 반복
         img_info = image_info_map.get(img_id)
 
-        # In this updated logic, img_id in image_ids_to_split implies img_info should exist
-        # and it should have valid file_name, width, height. But keeping checks for robustness.
+        # 이 업데이트된 로직에서는 image_ids_to_split에 있는 img_id는
+        # img_info가 존재하고, file_name, width, height 등의 정보가 유효해야 함.
+        # 하지만 견고함을 위해 체크는 유지함.
         if not img_info:
             print(f"Warning: Image info not found for ID {img_id} (should not happen if image_ids_to_split is correctly built). Skipping.")
             continue
@@ -219,57 +239,59 @@ def merge_and_convert_coco_to_yolo(json_paths, image_base_dir, output_base_dir, 
 
         # 라벨 파일 내용 생성
         yolo_lines = []
-        image_annotations = image_annotations_map.get(img_id, []) # Ensure it's a list even if empty
+        image_annotations = image_annotations_map.get(img_id, []) # 비어 있어도 반드시 리스트 형태가 되도록 보장
 
         if not image_annotations:
             # 이 경우는 image_ids_to_split에 포함된 이미지 ID는 아노테이션이 있어야 하므로,
             # 거의 발생하지 않아야 합니다. 하지만 혹시 모를 경우를 대비.
             print(f"Warning: No valid annotations found for image ID {img_id} after map creation. Skipping label creation.")
-            # Skip creating label file, but still copy image if needed.
-            # For YOLO, if no bbox, no label file is generated.
+            # 라벨 파일 생성은 건너뛰되, 필요한 경우 이미지는 여전히 복사함.
+            # YOLO 형식에서는 바운딩 박스(bbox)가 없으면 라벨 파일을 생성하지 않음.
 
-        for anno in image_annotations:
-            bbox = anno.get('bbox')
-            category_id = anno.get('category_id')
 
-            if bbox is None or category_id is None:
+        for anno in image_annotations:  # 해당 이미지에 연결된 모든 어노테이션(annotation)을 순회
+            bbox = anno.get('bbox')     # 바운딩 박스 좌표를 가져옴 (x, y, 너비, 높이)
+            category_id = anno.get('category_id')       # 어노테이션의 카테고리 ID를 가져옴
+
+            if bbox is None or category_id is None: # 바운딩 박스 또는 카테고리 ID가 없는 경우 경고 출력 후 건너뜀
                 print(f"Warning: Annotation missing 'bbox' or 'category_id': {anno}. Skipping this specific annotation.")
                 continue
 
-            x_min, y_min, bbox_width, bbox_height = bbox
+            x_min, y_min, bbox_width, bbox_height = bbox    # 바운딩 박스 좌표 및 크기 분해
 
-            # Ensure division by zero is avoided and dimensions are positive
+            # 이미지 크기가 0 이하이면 정규화 불가능하므로 경고 출력 후 해당 이미지 전체 어노테이션 건너뜀
             if img_width <= 0 or img_height <= 0:
                 print(f"Warning: Invalid image dimensions for image ID {img_id} ({img_width}x{img_height}). Cannot normalize bbox. Skipping this image.")
-                yolo_lines = [] # Clear any lines if image dimensions are bad
-                break # Exit inner loop for this image
-            if bbox_width < 0 or bbox_height < 0:
+                yolo_lines = [] # 이미지 전체 bbox 무효 처리
+                break # 이 이미지에 대해선 반복 중단    
+            if bbox_width < 0 or bbox_height < 0:       # 바운딩 박스 크기가 음수이면 잘못된 값이므로 건너뜀
                  print(f"Warning: Invalid bbox dimensions for image ID {img_id} ({bbox_width}x{bbox_height}). Skipping this specific annotation.")
                  continue
 
+            # YOLO 포맷에 맞게 중심 좌표와 크기를 정규화 (0~1 사이 값으로 변환)
             x_center = (x_min + bbox_width / 2) / img_width
             y_center = (y_min + bbox_height / 2) / img_height
             norm_width = bbox_width / img_width
             norm_height = bbox_height / img_height
 
-            # Ensure category_id exists in the map
+            # 카테고리 ID가 category_id_map에 존재하는지 확인
             yolo_class_id = category_id_map.get(category_id)
             if yolo_class_id is None:
                 print(f"Warning: Category ID {category_id} not found in category_id_map for annotation {anno}. Skipping this specific annotation.")
                 continue
 
-            # Ensure normalized values are within [0, 1] (due to potential floating point errors or invalid bbox)
+            # 정규화된 값이 0~1 범위를 벗어나지 않도록 보정 (부동소수점 오차 방지)
             x_center = max(0.0, min(1.0, x_center))
             y_center = max(0.0, min(1.0, y_center))
             norm_width = max(0.0, min(1.0, norm_width))
             norm_height = max(0.0, min(1.0, norm_height))
 
-            # Filter out annotations with zero or extremely small normalized dimensions
+            # 정규화된 바운딩 박스 크기가 0에 가까운 경우 (너무 작거나 잘못된 값), 무시
             if norm_width < 1e-6 or norm_height < 1e-6:
                 print(f"Warning: Very small or zero dimension bbox for image {file_name}: {bbox}. Skipping annotation.")
                 continue
 
-
+            # YOLO 포맷 라인 생성: class_id x_center y_center width height (소수점 6자리)
             yolo_lines.append(f"{yolo_class_id} {x_center:.6f} {y_center:.6f} {norm_width:.6f} {norm_height:.6f}")
 
         # 학습/검증 세트 폴더 결정
