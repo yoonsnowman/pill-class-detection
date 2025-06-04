@@ -21,7 +21,7 @@ def merge_and_convert_coco_to_yolo(json_paths, image_base_dir, output_base_dir, 
         json_paths (list): COCO JSON 어노테이션 파일 경로 리스트 (예: ['path/to/part1.json', 'path/to/part2.json']).
         image_base_dir (str): 원본 이미지 파일들이 있는 디렉토리의 베이스 경로.
                                (예: '/content/ai02-level1-project/train_images/')
-        output_base_dir (str): 변환된 YOLO 형식 데이터가 저장될 최상위 디렉토리.
+        output_base_dir (str): 변환된 YOLO 형식 데이터  가 저장될 최상위 디렉토리.
                                (예: '/content/datasets/pill_yolo_format')
         val_split (float): 검증 세트로 분할할 비율 (0.0 ~ 1.0).
     """
