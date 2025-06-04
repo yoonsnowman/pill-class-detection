@@ -6,11 +6,11 @@ import json
 import re
 import pandas as pd
 import torch
-from tqdm import tqdm # tqdm 임포트 추가
+from tqdm import tqdm
 import configs.config_paths as cc
 
 # --- 장치(Device) 설정 ---
-DEVICE = 'cuda' if torch.cuda.is_available() else 'cpu'
+device = 'cuda' if torch.cuda.is_available() else 'cpu'
 
 # --- 전역 설정 변수 (configs/config_paths.py 파일에서 로드) ---
 BASE_OUTPUT_DIR = cc.OUTPUT_DIR
@@ -61,7 +61,7 @@ def get_raw_predictions(model_load_path, conf_to_use, iou_to_use):
             augment=USE_TTA_PREDICT,
             save=False,
             stream=True, # stream=True일 때 results_iterator는 generator
-            device=DEVICE, verbose=False
+            device=device, verbose=False
         )
     except Exception as e:
         print(f"⚠️ [예측 실행] model.predict() 실행 중 오류 발생: {e}")
@@ -184,7 +184,7 @@ if __name__ == '__main__':
     print(f"사용 모델 경로: {model_for_prediction_path}")
     print(f"테스트 이미지 폴더: {TEST_IMAGES_DIR}")
     print(f"카테고리 ID 맵 경로: {CATEGORY_ID_MAP_PATH}")
-    print(f"사용 장치: {DEVICE}")
+    print(f"사용 장치: {device}")
     print(f"사용 Confidence: {LOCAL_DEFAULT_CONF}")
     print(f"사용 IoU: {LOCAL_DEFAULT_IOU}")
     print(f"TTA(테스트 시 증강) 사용 안 함: {not USE_TTA_PREDICT}")

@@ -3,25 +3,29 @@ import os
 import matplotlib.pyplot as plt
 import matplotlib.font_manager as fm
 
-# --- 기본 경로 설정 ---
-# 학습 시 사용할 사전 학습된 모델의 경로
-WEIGHTS_DIR = 'models/yolov8n.pt' # 예시로 yolov8n.pt 사용, 실제 사용하는 모델로 변경 필요
+# --- 경로 설정 ---
 
-## 데이터 관련
 # 데이터셋 구성 YAML 파일 경로
 YAML_DIR = 'data/yolo/pill_yolo_format/data.yaml'
+
 # train 이미지 폴더 경로
 TRAIN_IMG_DIR = 'data/yolo/pill_yolo_format/images/train/'
+
 # test 이미지 폴더 경로
 TEST_IMG_DIR = 'data/yolo/pill_yolo_format/images/test/'
+
 # val 이미지 폴더 경로
 VAL_IMG_DIR = 'data/yolo/pill_yolo_format/images/val/'
+
 # train 라벨 폴더 경로
 TRAIN_LB_DIR = 'data/yolo/pill_yolo_format/labels/train/'
+
 # val 라벨 폴더 경로
 VAL_LB_DIR = 'data/yolo/pill_yolo_format/labels/val/'
+
 # YOLO 클래스 ID와 제출용 카테고리 ID 매핑 파일 경로
 CAT_ID_DIR = 'data/yolo/pill_yolo_format/yolo_to_categoryid.json'
+
 # 시각화 등에 사용될 나눔고딕 폰트 파일 경로
 FONT_DIR = 'data/font/NanumGothic.ttf'
 
@@ -30,6 +34,11 @@ OUTPUT_DIR = 'outputs' # 최상위 출력 폴더
 
 # 최종 제출용 CSV 파일 이름 (predict.py에서 사용)
 SUBMISSION_FILENAME = 'submission.csv'
+
+# path_test.py 호출용
+TEST_PATH = 'data/yolo/pill_yolo_format/images/'
+
+
 
 # --- 폰트 설정 함수 ---
 def setup_font():

@@ -1,4 +1,4 @@
-[ Project Version 1.3.5 ]
+Project Version 1.3.8
 
 ## 💊 알약 객체 탐지 프로젝트
 
@@ -99,19 +99,20 @@ python scripts/predict.py \
 
 ## 👥 팀원
 
-| 이름     | 역할         | GitHub                                 |
+| 이름       | 역할         | GitHub                                 | 이메일 |
 |----------|--------------|-----------------------------------------|
-| 승호     | PM, 전처리     | [@your-github](https://github.com/your-github) |
-| 홍길동   | 모델링, 평가    | -                                       |
-| 홍길동   | 시각화, 테스트  | -                                       |
-
+| 홍길동1     | 공부        | [@your-github](https://github.com/your-github) |
+| 홍길동2     | 공부        | [@your-github](https://github.com/your-github) |
+| 홍길동3     | 공부        | [@your-github](https://github.com/your-github) |
+| 홍길동4     | 공부        | [@your-github](https://github.com/your-github) |
+| 홍길동5     | 공부        | [@your-github](https://github.com/your-github) |
+| 홍길동6     | 공부        | [@your-github](https://github.com/your-github) |
 
 ---
 
 ## 🔗 참고 자료
 
-- [Ultralytics YOLOv10 GitHub](https://github.com/ultralytics/ultralytics)
-- [Albumentations 공식 문서](https://albumentations.ai/)
+- [Ultralytics GitHub](https://github.com/ultralytics/ultralytics)
 - [COCO to YOLO 변환 스크립트 참고](https://github.com/ultralytics/JSON2YOLO)
 
 
@@ -120,11 +121,9 @@ python scripts/predict.py \
 
 ## 📄 라이선스
 
-<aside>
-⚠️ 본 페이지를 통해 제공하는 모든 자료는 저작권법에 의해 보호받는 ㈜코드잇의 자산이며, 무단 사용 및 도용, 복제 및 배포를 금합니다. 스프린트 과정 외부로의 링크 공유 등, 모든 형태의 유출을 금합니다.
+ 본 페이지를 통해 제공하는 모든 자료는 저작권법에 의해 보호받는 ㈜코드잇의 자산이며, 무단 사용 및 도용, 복제 및 배포를 금합니다. 스프린트 과정 외부로의 링크 공유 등, 모든 형태의 유출을 금합니다.
 
-Copyright 2025 코드잇 Inc. All rights reserved.
+⚠️ Copyright 2025 코드잇 Inc. All rights reserved.
 
-</aside>
 
 
