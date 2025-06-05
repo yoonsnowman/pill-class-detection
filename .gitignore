@@ -13,7 +13,8 @@ data/yolo
 **/*.pt
 *.pt
 *.pth
-
+**/weights/*.pt
+models/
 
 # ▶ 로컬/코랩에서 생성되는 출력 결과물
 *.log
