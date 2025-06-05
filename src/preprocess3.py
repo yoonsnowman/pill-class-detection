@@ -194,7 +194,7 @@ def merge_and_convert_coco_to_yolo(json_paths, image_base_dir, output_base_dir, 
             stratify=np.array(valid_stratify_labels) # 유효한 stratify_labels만 전달
         )
     else:
-        # Fallback to non-stratified split if stratification is not possible
+        # 층화 추출이 불가능한 경우, 일반(비층화) 분할 방식으로 대체
         train_ids, val_ids = train_test_split(
             np.array(image_ids_to_split),
             test_size=val_split,
