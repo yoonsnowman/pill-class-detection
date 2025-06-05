@@ -149,6 +149,7 @@ def merge_and_convert_coco_to_yolo(json_paths, image_base_dir, output_base_dir, 
 
 
     # --- MODIFIED STRATIFY LOGIC ---
+    # 클래스 비율을 나눌 때 클래스 불균형을 방지하기 위해서 사용
     # stratify를 위한 라벨 생성
     # 각 이미지에 첫 번째 어노테이션의 클래스 ID를 사용합니다.
     # 이미지에 어노테이션이 없는 경우, 또는 유효한 category_id가 없는 경우는 None으로 처리합니다.
