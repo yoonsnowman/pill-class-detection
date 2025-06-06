@@ -7,22 +7,22 @@ import albumentations as A
 import random
 import argparse
 import statistics
-import configs.config_paths as cc # 설정 파일 임포트
+import configs.config_paths as cc
 
 """
 🔧 사용법:
 
-# ─── 기존 train 이미지 복사 (증강 폴더로) ───────────────────────
-!python scripts/oversample_rare_class.py --train_copy
+## 1. train 이미지 증강 폴더로 복사
+python -m scripts.oversample --train_copy
 
-# ─── 증강 폴더의 전체 클래스 개수 출력 (+ 특정 개수 미만 클래스 확인) ────────
-!python scripts/oversample_rare_class.py --list 50
+## 2. 특정 수량 이하 클래스 출력
+python -m scripts.oversample --list 50
 
-# ─── 증강 폴더의 전체 클래스를 지정된 목표 수량까지 증강 ───────────────
-!python scripts/oversample_rare_class.py --aug all --target 50
+## 3. 전체 클래스 -> 목표 수량까지 증강
+python -m scripts.oversample --aug all --target 50
 
-# ─── 특정 클래스만 지정된 목표 수량까지 증강 ────────────────────────
-!python scripts/oversample_rare_class.py --aug 2 5 8 --target 50
+## 4. 특정 클래스 -> 목표 수량까지 증강
+python -m scripts.oversample --aug 2 5 8 --target 50
 
 """
 
@@ -30,10 +30,6 @@ import configs.config_paths as cc # 설정 파일 임포트
 # 📁 전역 경로 설정 (configs.config_paths.py 기반)
 base_label_dir = cc.TRAIN_LB_DIR
 base_image_dir = cc.TRAIN_IMG_DIR
-
-# 증강된 데이터가 저장될 경로 (main 함수 내에서 args와 함께 결정될 수 있으나,
-# 스크립트의 주요 대상 폴더이므로 여기서 정의하고 main에서 생성만 하도록 함)
-# os.path.basename 사용 시 슬래시('/')로 끝나는 경로에 문제 있을 수 있어 normpath 사용 고려
 norm_base_label_dir = os.path.normpath(base_label_dir)
 norm_base_image_dir = os.path.normpath(base_image_dir)
 aug_label_dir = os.path.join(os.path.dirname(norm_base_label_dir), os.path.basename(norm_base_label_dir) + '_aug')
@@ -41,11 +37,23 @@ aug_image_dir = os.path.join(os.path.dirname(norm_base_image_dir), os.path.basen
 
 
 # ───────────────────────────────
-# 증강기 정의
+# 증강기 정의 (현재 밝기&명도, 색조, 확대&축소)
 augmentor = A.Compose([
-    A.RandomBrightnessContrast(brightness_limit=0.1, contrast_limit=0.1, p=0.3),
-    A.HueSaturationValue(hue_shift_limit=0, sat_shift_limit=3, val_shift_limit=0, p=0.3),
-    A.Affine(scale=(0.95, 1.05), p=0.5)
+    A.RandomBrightnessContrast(
+        brightness_limit=0.1, 
+        contrast_limit=0.1, 
+        p=0.3
+    ),
+    A.HueSaturationValue(
+        hue_shift_limit=0, 
+        sat_shift_limit=3, 
+        val_shift_limit=0, 
+        p=0.3
+    ),
+    A.Affine(
+        scale=(0.95, 1.05), 
+        p=0.5
+    )
 ], bbox_params=A.BboxParams(
     format='yolo',
     label_fields=['class_labels']

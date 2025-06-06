@@ -7,19 +7,11 @@ from collections import Counter
 import configs.config_paths as cc
 
 # ────────────────────────────────
-# 📁 경로 설정 (configs.config_paths.py 기반으로 수정)
-
-# 분석할 학습 라벨 파일이 있는 폴더 (config 파일에서 가져옴)
-label_dir = cc.TRAIN_LB_DIR
-# 결과 CSV 저장 경로 (config 파일의 YAML_DIR을 기준으로 상위 폴더에 저장)
-# 예: YAML_DIR이 'data/yolo/pill_yolo_format/data.yaml'이면,
-# 저장 경로는 'data/yolo/pill_yolo_format/'가 됩니다.
-base_data_dir = os.path.dirname(cc.YAML_DIR) # 'data/yolo/pill_yolo_format'
-save_csv_path = os.path.join(base_data_dir, 'classes_train.csv')
-
-# configs.config_paths.py 에서 경로 가져오기
-category_id_map_path = cc.CAT_ID_DIR # YOLO 클래스 ID와 제출용 카테고리 ID 매핑 파일 경로
-dataset_yaml_path = cc.YAML_DIR      # 데이터셋 구성 YAML 파일 경로
+# 📁 경로 설정
+label_dir = os.path.join(cc.LABEL_PATH, 'train')  # 폴더명 변경 가능
+save_csv_path = os.path.join(cc.PRE_OUT_DIR, 'classes_train.csv')  # 파일명 변경 가능
+category_id_map_path = cc.CAT_ID_DIR
+dataset_yaml_path = cc.YAML_DIR
 
 # ────────────────────────────────
 # 📥 파일 불러오기
@@ -103,14 +95,14 @@ for cls_id in sorted(class_counter.keys()):
     # yolo_to_categoryid는 문자열 키를 가질 수 있으므로 str(cls_id)로 조회
     category_id_str = str(cls_id)
     if category_id_str not in yolo_to_categoryid:
-        print(f"⚠️ YOLO 클래스 ID '{cls_id}'에 대한 Category ID 매핑이 JSON 파일에 없습니다. 건너<0xEB><0x81><0xB5>니다.")
+        print(f"⚠️ YOLO 클래스 ID '{cls_id}'에 대한 Category ID 매핑이 JSON 파일에 없습니다.")
         resolved_category_id = "매핑 없음" # 또는 다른 기본값
     else:
         resolved_category_id = yolo_to_categoryid[category_id_str]
 
     # yolo_names는 정수 인덱스를 사용
     if cls_id < 0 or cls_id >= len(yolo_names):
-        print(f"⚠️ YOLO 클래스 ID '{cls_id}'가 YAML 파일의 'names' 리스트 범위를 벗어났습니다. 건너<0xEB><0x81><0xB5>니다.")
+        print(f"⚠️ YOLO 클래스 ID '{cls_id}'가 YAML 파일의 'names' 리스트 범위를 벗어났습니다.")
         pill_name = "이름 없음" # 또는 다른 기본값
     else:
         pill_name = yolo_names[cls_id]
@@ -138,7 +130,7 @@ if csv_rows: # 저장할 데이터가 있을 경우에만 CSV 생성
             os.makedirs(save_dir)
             
         df.to_csv(save_csv_path, index=False, encoding='utf-8-sig')
-        print(f"\n✅ '{label_dir}'의 클래스 통계 CSV 저장 완료: {save_csv_path}")
+        print(f"\n✅ 클래스 통계 CSV 저장 완료: {save_csv_path}")
     except IOError as e:
         print(f"\n⚠️ CSV 파일 저장 중 오류 발생: {e}")
     except Exception as e:
