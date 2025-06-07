@@ -1,85 +1,86 @@
-# main.py
 import argparse
 import subprocess
 import sys
 
-# 기본값 사용
-# python -m main
-
-# 설정값 사용(모델pt명, outputs/에 저장할 폴더명, 배치, 에포크)
-# python -m main all --model yolov8n --name v8n --b 32 --e 10
-
 
 def run_preprocess():
-    print("\n🚀 [1/3] preprocess.py 실행")
+    print("\n🚀 [1/5] preprocess.py 실행")
+    print("[INFO] YOLO 포맷으로 파싱을 진행합니다.")
+    subprocess.run([sys.executable, "-m", "src.preprocess"], check=True)
+
+
+def run_oversample(list_threshold: int, aug: str, target: int):
+    print("\n🚀 [2/5] oversample.py 실행")
+    print("[INFO] 소수 클래스 데이터를 증강합니다.")
     subprocess.run([
-        sys.executable, "-m", "src.preprocess"
+        sys.executable, "-m", "scripts.oversample",
+        "--train_copy",
+        "--list", str(list_threshold),
+        "--aug", aug,
+        "--target", str(target)
     ], check=True)
 
 
-def run_train(args):
-    print(f"\n🚀 [2/3] train.py 실행")
+def run_class_counter():
+    print("\n🚀 [3/5] class_counter.py 실행")
+    subprocess.run([
+        sys.executable, "-m", "scripts.class_counter"
+    ], check=True)
+
+
+def run_train(model: str, name: str, b: int, e: int):
+    print(f"\n🚀 [4/5] train.py 실행")
+    print("[INFO] 기본값 실행 [MODEL: yolov8x | BATCH: 32 | EPOCHS: 100]")
+    print("[INFO] 세부설정 변경 시 train.py 개별 실행이 필요합니다.")
     subprocess.run([
         sys.executable, "-m", "src.train",
-        "--model", args.model,
-        "--name", args.name,
-        "--b", str(args.b),
-        "--e", str(args.e)
+        "--model", model,
+        "--name", name,
+        "--b", str(b),
+        "--e", str(e)
     ], check=True)
 
 
-def run_predict(args):
-    print(f"\n🚀 [3/3] predict.py 실행") 
+def run_predict(name: str):
+    print(f"\n🚀 [5/5] predict.py 실행")
+    print("[INFO] 기본값 실행 [CONF = 0.001 | IOU = 0.45]")
+    print("[INFO] 세부설정 변경 시 predict.py 개별 실행이 필요합니다.")
     subprocess.run([
         sys.executable, "-m", "src.predict",
-        "--name", args.name
+        "--name", name
     ], check=True)
-
-
-def run_all(args):
-    run_preprocess()
-    run_train(args)
-    run_predict(args)
 
 
 if __name__ == "__main__":
-    # ✅ 기본값 설정: 아무 인자도 없을 경우 자동 실행
     if len(sys.argv) == 1:
-        print("⚙️ 기본값으로 실행합니다.")
-        print("python -m main all --model yolov8x --name v8x --b 32 --e 50")
-        sys.argv += ["all", "--model", "yolov8x", "--name", "v8x", "--b", "32", "--e", "50"]
+        print("⚙️ main.py 실행 감지 [기본값 자동 실행]")
+        sys.argv += [
+            "--model", "yolov8x",
+            "--name", "v8x",
+            "--b", "32",
+            "--e", "100",
+            "--train_copy",
+            "--list", "30",
+            "--aug", "all",
+            "--target", "30"
+        ]
 
-    parser = argparse.ArgumentParser(description="YOLO 파이프라인 메인 실행 스크립트")
-    subparsers = parser.add_subparsers(dest="command", required=True)
-
-    # preprocess
-    subparsers.add_parser("preprocess", help="데이터 전처리 실행")
-
-    # train
-    train_parser = subparsers.add_parser("train", help="모델 학습 실행")
-    train_parser.add_argument("--model", type=str, required=True)
-    train_parser.add_argument("--name", type=str, required=True)
-    train_parser.add_argument("--b", type=int, required=True)
-    train_parser.add_argument("--e", type=int, required=True)
-
-    # predict
-    predict_parser = subparsers.add_parser("predict", help="예측 및 제출 파일 생성")
-    predict_parser.add_argument("--name", type=str, required=True)
-
-    # all-in-one 실행
-    all_parser = subparsers.add_parser("all", help="전처리+학습+예측 전체 실행")
-    all_parser.add_argument("--model", type=str, required=True)
-    all_parser.add_argument("--name", type=str, required=True)
-    all_parser.add_argument("--b", type=int, required=True)
-    all_parser.add_argument("--e", type=int, required=True)
+    parser = argparse.ArgumentParser(
+        description="YOLO 전체 파이프라인 실행 (preprocess → oversample → class_counter2 → train → predict)"
+    )
+    parser.add_argument("--model", type=str, required=True, help="모델 이름 (예: yolov8n)")
+    parser.add_argument("--name", type=str, required=True, help="결과 저장 이름 (예: v8n)")
+    parser.add_argument("--b", type=int, required=True, help="배치 크기 (예: 32)")
+    parser.add_argument("--e", type=int, required=True, help="에포크 수 (예: 50)")
+    parser.add_argument("--train_copy", action="store_true", help="원본 데이터를 복사하여 oversample에 사용")
+    parser.add_argument("--list", type=int, default=30, help="오버샘플링 list 기준값")
+    parser.add_argument("--aug", type=str, default="all", help="오버샘플링 대상 클래스 (기본: all)")
+    parser.add_argument("--target", type=int, default=30, help="오버샘플링 target 수량")
 
     args = parser.parse_args()
 
-    if args.command == "preprocess":
-        run_preprocess()
-    elif args.command == "train":
-        run_train(args)
-    elif args.command == "predict":
-        run_predict(args)
-    elif args.command == "all":
-        run_all(args)
+    run_preprocess()
+    run_oversample(args.list, args.aug, args.target)
+    run_class_counter()
+    run_train(args.model, args.name, args.b, args.e)
+    run_predict(args.name)

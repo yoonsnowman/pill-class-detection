@@ -9,10 +9,6 @@ def count_images(folder_path):
     exts = ['*.jpg', '*.jpeg', '*.png', '*.bmp', '*.webp']
     return sum(len(glob.glob(os.path.join(folder_path, ext))) for ext in exts)
 
-# 📌 txt 라벨 수량 세기
-def count_labels(folder_path):
-    return len(glob.glob(os.path.join(folder_path, "*.txt")))
-
 # 📌 폴더 내 항목 수 세기
 def count_entries(path):
     if not os.path.exists(path):
@@ -25,9 +21,8 @@ def count_entries(path):
 print("\n📂 [이미지 수량 확인]")
 
 img_dirs = {
-    'train': cc.TRAIN_IMG_DIR,
-    'test': cc.TEST_IMG_DIR,
-    'val': cc.VAL_IMG_DIR,
+    'train': os.path.join(cc.PRE_IN_DIR,'train_images'),
+    'test': os.path.join(cc.PRE_IN_DIR,'test_images'),
 }
 
 for name, path in img_dirs.items():
@@ -35,20 +30,6 @@ for name, path in img_dirs.items():
         print(f"- {name} 이미지 경로 ❌ 없음 → {path}")
     else:
         print(f"- {name}: {count_images(path)}장 ({path})")
-
-# -------------------------
-print("\n📝 [라벨 수량 확인]")
-
-label_dirs = {
-    'train': cc.TRAIN_LB_DIR,
-    'val': cc.VAL_LB_DIR,
-}
-
-for name, path in label_dirs.items():
-    if not os.path.exists(path):
-        print(f"- {name} 라벨 경로 ❌ 없음 → {path}")
-    else:
-        print(f"- {name}: {count_labels(path)}개 ({path})")
 
 # -------------------------
 print("\n🧭 [프로젝트 구조 확인]")

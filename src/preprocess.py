@@ -36,7 +36,7 @@ def merge_and_convert_coco_to_yolo(json_paths, image_base_dir, output_base_dir, 
     category_id_map = {}
     next_yolo_class_id = 0
 
-    for json_path in tqdm(json_paths, desc="[1/5] JSON 어노테이션 통합"):
+    for json_path in tqdm(json_paths, desc="(Stage 1/5) JSON 어노테이션 통합"):
         try:
             with open(json_path, 'r', encoding='utf-8') as f:
                 data = json.load(f)
@@ -169,7 +169,7 @@ def merge_and_convert_coco_to_yolo(json_paths, image_base_dir, output_base_dir, 
     # -------------------- YOLO 변환 및 이미지 복사 --------------------
     # 이미지별로 어노테이션을 YOLO 형식으로 변환하고,
     # 생성된 라벨 파일과 이미지를 train/val 폴더로 복사
-    for img_id in tqdm(image_ids_to_split, desc="[2/5] 학습/검증 데이터 YOLO 변환 및 분리"):
+    for img_id in tqdm(image_ids_to_split, desc="(Stage 2/5) 학습/검증 데이터 YOLO 변환 및 분리"):
         # 이미지 메타 정보 조회 (파일명, 너비, 높이)
         img_info = image_info_map.get(img_id)
         if not img_info:
@@ -259,7 +259,7 @@ def merge_and_convert_coco_to_yolo(json_paths, image_base_dir, output_base_dir, 
 # ====================================================================
 def create_yolo_yaml(yaml_file_path, output_data_dir, class_names_list):
     data_for_yaml = {
-        'train': 'images/train',
+        'train': 'images/train_aug',
         'val': 'images/val',
         'nc': len(class_names_list),
         'names': class_names_list
@@ -268,7 +268,7 @@ def create_yolo_yaml(yaml_file_path, output_data_dir, class_names_list):
     with open(yaml_file_path, 'w', encoding='utf-8') as f:
         yaml.dump(data_for_yaml, f, sort_keys=False, allow_unicode=True, indent=2)
 
-    print(f"[5/5] YOLO 학습 설정 파일(data.yaml) 생성 완료 (경로: {yaml_file_path})")
+    print(f"(Stage 5/5) data.yaml 생성 완료 (경로: {yaml_file_path})")
 
 
 # ==================== 전체 파이프라인 실행 (main 블록) ===================
@@ -277,7 +277,7 @@ def create_yolo_yaml(yaml_file_path, output_data_dir, class_names_list):
 # 실행 흐름을 순서대로 출력
 # =====================================================================
 if __name__ == '__main__':
-    print("[INFO] 데이터 확인 중 | 시간이 소요될 수 있습니다")
+    print("[INFO] 데이터 로드 중")
     output_yolo_data_dir = output_dir
     yaml_file_path = os.path.join(output_yolo_data_dir, 'data.yaml')
     class_names_path = os.path.join(output_yolo_data_dir, 'class_names.json')
@@ -293,7 +293,7 @@ if __name__ == '__main__':
     converted_class_names = None
 
     if can_skip_preprocessing:
-        print("[INFO] 이미 모든 전처리 파일 존재 [5/5] 단계 바로 진행")
+        print("[INFO] 이미 모든 전처리 파일 존재 (Stage 5/5) 단계 바로 진행")
         try:
             with open(class_names_path, 'r', encoding='utf-8') as f:
                 converted_class_names = json.load(f)
@@ -324,7 +324,7 @@ if __name__ == '__main__':
 
             if os.path.exists(test_src_dir):
                 test_files = [f for f in os.listdir(test_src_dir) if f.lower().endswith(('.png', '.jpg', '.jpeg'))]
-                for file_name in tqdm(test_files, desc="[3/5] 테스트 이미지 복사"):
+                for file_name in tqdm(test_files, desc="(Stage 3/5) 테스트 이미지 복사"):
                     shutil.copy(os.path.join(test_src_dir, file_name), test_dest_dir)
 
             # -------------------- 클래스 매핑 및 이름 저장 --------------------
@@ -334,7 +334,7 @@ if __name__ == '__main__':
 
             with open(class_names_path, "w", encoding="utf-8") as f:
                 json.dump(converted_class_names, f, ensure_ascii=False, indent=2)
-            print("[4/5] 클래스 정보 및 ID 매핑 저장")
+            print("(Stage 4/5) 클래스 정보 및 ID 매핑 저장")
         else:
             exit()
 

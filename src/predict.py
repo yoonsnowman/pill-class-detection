@@ -19,7 +19,7 @@ CATEGORY_ID_MAP_PATH = cc.CAT_ID_DIR
 
 # ---------- 예측 기본값 설정 ----------
 MODEL_FILENAME_FROM_TRAIN = 'best.pt'
-LOCAL_DEFAULT_CONF = 0.25
+LOCAL_DEFAULT_CONF = 0.001
 LOCAL_DEFAULT_IOU = 0.45
 
 
@@ -119,7 +119,7 @@ def generate_and_save_submission_csv(raw_predictions_data, submission_file_path)
             yolo_class_id = detected_box["cls"]
 
             if yolo_class_id not in yolo_cls_to_submission_cat_id:
-                print(f"⚠️ Category ID 매핑에 없는 YOLO 클래스 ID 발견: {yolo_class_id} (이미지 ID: {image_submission_id}). 이 box는 건너<0xEB><0x81><0xB5>니다.")
+                print(f"⚠️ Category ID 매핑에 없는 YOLO 클래스 ID 발견: {yolo_class_id} (이미지 ID: {image_submission_id}).")
                 continue
             submission_category_id = yolo_cls_to_submission_cat_id[yolo_class_id]
             output_rows.append([

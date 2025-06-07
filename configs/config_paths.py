@@ -9,6 +9,13 @@ PRE_IN_DIR = 'data/yolo'
 PRE_OUT_DIR = 'data/yolo/pill_yolo_format'
 
 
+# ---------- oversample.py 호출용 ----------
+TRAIN_IMG_DIR = 'data/yolo/pill_yolo_format/images/train/'
+TRAIN_LB_DIR = 'data/yolo/pill_yolo_format/labels/train/'
+# TEST_IMG_DIR  # predict.py에 존재하여 주석처리
+
+
+
 # ---------- train.py 호출용 ----------
 YAML_DIR = 'data/yolo/pill_yolo_format/data.yaml'  #YAML 파일 경로
 OUTPUT_DIR = 'outputs'  # 예측값 출력 폴더
@@ -27,9 +34,7 @@ TRAIN_LB_DIR = 'data/yolo/pill_yolo_format/labels/train/'
 # YAML_DIR  # train.py에 존재하여 주석처리
 
 
-# ---------- oversample.py 호출용 ----------
-TRAIN_IMG_DIR = 'data/yolo/pill_yolo_format/images/train/'  # train 이미지 폴더 경로
-# TEST_IMG_DIR  # predict.py에 존재하여 주석처리
+
 
 
 # ---------- class_counter.py 호출용 ----------
